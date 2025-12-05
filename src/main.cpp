@@ -61,6 +61,34 @@ void loop() {
   http.begin(apiURL);
   int httpCode = http.GET();
 
+  Serial.print("Code HTTP: ");
+  Serial.println(httpCode);
+
+  if (httpCode == HTTP_CODE_OK) {
+    String payload = http.getString();
+
+    StaticJsonDocument<256> doc;
+    DeserializationError err = deserializeJson(doc, payload);
+
+    if (err) {
+      Serial.print("Erreur JSON: ");
+      Serial.println(err.c_str());
+    } else {
+      const char* latitude = doc["iss_position"]["latitude"];
+      const char* longitude = doc["iss_position"]["longitude"];
+      Serial.print("ISS position -> Lat: ");
+      Serial.print(latitude);
+      Serial.print(" | Lon: ");
+      Serial.println(longitude);
+    }
+  } else if (httpCode >= 400 && httpCode < 600) {
+    Serial.println("Erreur HTTP: code indique une erreur cote client ou serveur.");
+  } else if (httpCode < 0) {
+    Serial.println("Erreur HTTP: requete non envoyee (verifier la connexion).");
+  } else {
+    Serial.println("Reponse HTTP inattendue.");
+  }
+
   http.end();
   delay(5000); // pause avant la prochaine requete
 }
