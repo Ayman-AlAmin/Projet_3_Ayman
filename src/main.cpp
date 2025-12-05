@@ -69,7 +69,6 @@ void loop() {
 
     StaticJsonDocument<256> doc;
     DeserializationError err = deserializeJson(doc, payload);
-
     if (err) {
       Serial.print("Erreur JSON: ");
       Serial.println(err.c_str());
