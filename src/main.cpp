@@ -58,15 +58,28 @@ void loop() {
   }
 
   HTTPClient http;
+  const char* headerKeys[] = {"Content-Type", "Date", "Server"};
+  const size_t headerKeysCount = sizeof(headerKeys) / sizeof(headerKeys[0]);
+  http.collectHeaders(headerKeys, headerKeysCount);
   http.begin(apiURL);
   int httpCode = http.GET();
 
   Serial.print("Code HTTP: ");
   Serial.println(httpCode);
 
-  if (httpCode == HTTP_CODE_OK) {
-    String payload = http.getString();
+  // Afficher quelques entetes utiles
+  for (size_t i = 0; i < headerKeysCount; i++) {
+    Serial.print(headerKeys[i]);
+    Serial.print(": ");
+    Serial.println(http.header(headerKeys[i]));
+  }
 
+  // Lire et afficher le corps de la reponse
+  String payload = http.getString();
+  Serial.println("Corps de la reponse:");
+  Serial.println(payload);
+
+  if (httpCode == HTTP_CODE_OK) {
     StaticJsonDocument<256> doc;
     DeserializationError err = deserializeJson(doc, payload);
     if (err) {
