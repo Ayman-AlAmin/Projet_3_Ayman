@@ -1,9 +1,15 @@
 #include <Arduino.h>
 #include <WiFi.h>
+#include <HTTPClient.h>
+#include <ArduinoJson.h>
 
 // Information de connexion WiFi
 const char* ssid = "IOT-6220";
 const char* password = "6220@Maisonneuve"; // PAS SUR A REVOIR!!!!!!!!!!!!!!
+
+// API auquel il faut se connecter
+const char* apiURL = "http://api.open-notify.org/iss-now.json";
+
 
 
 
@@ -44,6 +50,18 @@ void setup() {
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
+  if (WiFi.status() != WL_CONNECTED) {
+    Serial.println("WiFi deconnecte, tentative de reconnexion...");
+    WiFi.reconnect();
+    delay(2000);
+    return;
+  }
+
+  HTTPClient http;
+  http.begin(apiURL);
+  int httpCode = http.GET();
+
+  http.end();
+  delay(5000); // pause avant la prochaine requete
 }
 
